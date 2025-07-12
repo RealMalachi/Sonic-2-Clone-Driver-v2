@@ -2460,7 +2460,6 @@ PSGDoVolFX:
 
 PSGDoVolFX_Loop:
 	move.b	SMPS_Track.VolEnvIndex(a5),d1	; Get volume envelope index
-	addq.b	#1,SMPS_Track.VolEnvIndex(a5)	; Increment volume envelope index
 	move.b	(a0,d1.w),d0			; Get volume envelope value
 	bpl.s	.gotflutter			; If it is not a terminator, branch
 	cmpi.b	#$80,d0				; Clownacy | Third most commonly used
@@ -2473,6 +2472,7 @@ PSGDoVolFX_Loop:
 	beq.s	VolEnvOff			; 83 - turn Note Off
 ; loc_72960:
 .gotflutter:
+	addq.b	#1,SMPS_Track.VolEnvIndex(a5)	; Increment volume envelope index ; ML: don't increment for commands!
 	lsl.b	#3,d0
 	add.b	d0,d6		; Add volume envelope value to volume
 	bcs.s	.cap
@@ -2539,8 +2539,8 @@ VolEnvReset:	; For compatibility with S3K
 ; ===========================================================================
 ; loc_7299A: FlutterDone:
 VolEnvHold:
-	; Decrement volume envelope index to before flag and last volume update (PSG volume will still update on subsequent frame)
-	subq.b	#2,SMPS_Track.VolEnvIndex(a5)
+	; Decrement volume envelope index to before last volume update (PSG volume will still update on subsequent frame)
+	subq.b	#1,SMPS_Track.VolEnvIndex(a5)
 	bra.w	PSGDoVolFX_Loop
 
 ; ===========================================================================
